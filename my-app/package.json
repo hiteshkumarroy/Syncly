@@ -7,11 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
-
-
-
   },
-  
   "dependencies": {
     "@clerk/nextjs": "^5.7.1",
     "@clerk/themes": "^2.1.43",
@@ -24,6 +20,7 @@
     "@radix-ui/react-tabs": "^1.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "embla-carousel-autoplay": "^8.3.1",
     "embla-carousel-react": "^8.3.1",
     "lucide-react": "^0.456.0",
     "next": "15.0.3",
