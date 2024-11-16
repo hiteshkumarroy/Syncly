@@ -4,7 +4,9 @@ import Link from "next/link"
 import { Button } from "./button"
 import { PenBox } from "lucide-react"
 import UserMenu from "./user-menu"
-const Header=()=>{
+import { checkUser } from "@/lib/checkUser"
+const Header=async()=>{
+  await checkUser();
   return(
     <>
     <header className="container mx-auto">
@@ -22,7 +24,8 @@ const Header=()=>{
     </Link>
 
     <SignedOut>
-<SignInButton forceRedirectUrl="/onboarding">
+<SignInButton >
+
 <Button variant="outline">Login</Button>
 </SignInButton>
     </SignedOut>
