@@ -1,3 +1,5 @@
+
+
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs"
 import Image from "next/image"
 import Link from "next/link"
@@ -5,6 +7,7 @@ import { Button } from "./button"
 import { PenBox } from "lucide-react"
 import UserMenu from "./user-menu"
 import { checkUser } from "@/lib/checkUser"
+import UserLoading from "./user-loading"
 const Header=async()=>{
   await checkUser();
   return(
@@ -35,6 +38,7 @@ const Header=async()=>{
     </div>
 </nav>
 
+<UserLoading/>
     </header>
     
     </>
