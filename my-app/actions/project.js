@@ -1,5 +1,6 @@
+"use server"
 import { db } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@clerk/nextjs/server";
 
 export async function CreateProject(data){
   const {userId,orgId}=auth();
@@ -12,17 +13,17 @@ if(!orgId){
 }
 
 const {data:membership} = await clerkClient().organizations.getOrganizationMembershipList({
-  organizationId:organization.id});
+  organizationId:orgId});
   
 
   const userMembership=membership.find((member)=>member.publicUserData.userId===userId);
   
-if(!userMembership || userMembershilp.role !== "org:admin"){
+if(!userMembership || userMembership.role !== "org:admin"){
   throw new Error("only admins can createprojects");
 }
 
 try{
-  const project= await db.project.create.create({
+  const project= await db.project.create({
 data:{
   name:data.name,
   key:data.key,
@@ -37,4 +38,23 @@ data:{
   throw new Error("Error creating project: "+ error.message);
 }
 }
-export  default CreateProject;
+
+
+export async function getProjects(orgId){
+  const {userId}=auth();
+  if(!userId){
+    throw new Error("Unauthorized");
+  }
+  const user=await db.user.findUnique({
+    where:{clerkUserId:userId},
+  })
+  if(!user){
+    throw new Error("User not found");
+  }
+  const projects=await db.project.findMany({
+    where:{organizationId:orgId},
+    orderBy:{createdAt:"desc"},
+  });
+  return projects;
+}
+

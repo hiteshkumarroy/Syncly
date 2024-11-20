@@ -2,6 +2,7 @@ import { getOrganization } from "@/actions/organization";
 import OrgSwitcher from "@/components/ui/org-switcher";
 import { OrganizationList, useOrganization } from "@clerk/nextjs";
 import React from "react";
+import ProjectList from "./_components/project-list";
 const Organization=async({params})=>{
 
  
@@ -20,7 +21,7 @@ const Organization=async({params})=>{
 
    </div>
 <div className="mb-4">
-  Show org projects
+ <ProjectList orgId={organization.id}/>
 
 </div>
 <div className="mt-8">
