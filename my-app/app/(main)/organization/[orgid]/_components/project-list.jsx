@@ -21,8 +21,10 @@ return( <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
     return(
   <Card key={project.id}>
   <CardHeader>
-    <CardTitle className="flex justify-between items-center">{project.name}</CardTitle>
-  <DeleteProject projectId={project.id} />
+    <CardTitle className="flex justify-between items-center">{project.name}  
+    <DeleteProject projectId={project.id} />
+    </CardTitle>
+
   </CardHeader>
   <CardContent>
   <p className="text-sm text-gray-500 mb-4">{project.description || 'No description available'}</p>
