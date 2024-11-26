@@ -4,15 +4,22 @@ import { createSprint } from "@/actions/sprints";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverTrigger } from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { zodResolver } from "@hookform/resolvers/zod";
+
 import { addDays, format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
 import React, { useState } from "react";
+import { Chevron, DayPicker } from "react-day-picker";
 import { Controller, Form, useForm } from "react-hook-form";
+import "react-day-picker/dist/style.css";
+import useFetch from "@/hooks/use-fetch";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { sprintSchema } from "@/app/lib/validators";
 const SprintCreationForm=({projectTitle,projectKey,projectId,sprintKey})=>{
 
-  
+  const router=useRouter();
   const[showForm,setShowForm]=useState(false);
 
 
@@ -22,14 +29,29 @@ const[dateRange,setDateRange]=useState({from:new Date(),
 
 
   const {register,handleSubmit,formState:{errors},control}=useForm({
-    resolver:zodResolver(createSprint),
+    resolver:zodResolver(sprintSchema),
     defaultValues:{
     name:`${projectKey}-${sprintKey}`,
   startDate:dateRange.from,
-endDate:dateRange.to,},
+endDate:dateRange.to,
+
+},
   })
 
+const{loading:createSprintLoading, fn:createSprintFn}=useFetch(createSprint);
 
+
+
+const onSubmit = async(data)=>{
+  await createSprintFn(projectId,{
+    ...data,
+    startDate:dateRange.from,
+    endDate:dateRange.to,
+  });
+  setShowForm(false);
+  toast.success("sprint created successfully");
+  router.refresh();
+}
   return(
     <>
     <div className="flex justify-between">
@@ -44,7 +66,7 @@ endDate:dateRange.to,},
       
 <CardContent>
 
-  <form className="flex gap-4 items-end">
+  <form className="flex gap-4 items-end" onSubmit={handleSubmit(onSubmit)}>
     <div className="flex-1">
       <label htmlFor="name" className="block text-sm font-medium mb-1">Sprint name</label>
       <Input id="name" readOnly className="bg-slate-950" 
@@ -53,7 +75,8 @@ endDate:dateRange.to,},
       { errors.name && 
         (<p className="text-red-500 text-sm mt-1">{errors.name.message}</p>)}
 </div>
-<div>
+
+<div className="flex-1">
 
 
     <label htmlFor="name" className="block text-sm font-medium mb-1">
@@ -62,15 +85,36 @@ endDate:dateRange.to,},
       <Controller control={control} name="dateRange" render={({field})=>{
         return(<Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline">
+            <Button variant="outline" className={`w-full justify-start text-left font-normal bg-slate-950 ${!dateRange && "text-muted-foreground"} `}>
 
 
               <CalendarIcon className="mr-2 h-4 w-4"/>
+
               {dateRange.from && dateRange.to?(
   format(dateRange.from,"LLL dd y")+ " - "+  format(dateRange.to,"LLL dd y")
   ):(<span>Pick a date</span>)}
               </Button>
           </PopoverTrigger>
+
+ <PopoverContent  className="w-auto bg-slate-900" align="start">
+  <DayPicker mode="range"  selected={dateRange} onSelect={(range)=>{
+    if(range?.from && range?.to){
+      setDateRange(range);
+      field.onChange(range);
+    }
+  }}
+  
+  classNames={{
+    Chevron:"fill-blue-500",
+    range_start:"bg-blue-700",
+    range_end:"bg-blue-700",
+    range_middle:"bg-blue-400",
+    day_button: "border-none",
+    today:"border-2 border-blue-700"
+  }}
+  
+  />
+  </PopoverContent>  
         </Popover>
         )
       }}/>
@@ -78,7 +122,12 @@ endDate:dateRange.to,},
 
     
   
-</div></form>
+</div>
+
+<Button type="submit" disabled={createSprintLoading}>
+ {createSprintLoading ? "Creating..." : "Create Sprint"}
+</Button>
+</form>
   
 </CardContent>
 

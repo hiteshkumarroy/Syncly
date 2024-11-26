@@ -21,7 +21,7 @@ const Sprint=await db.sprint.create({
     name:data.name,
     startDate:data.startDate,
     endDate:data.endDate,
-    status:"planned",
+    status:"PLANNED",
     projectId:projectId,
   }
 })
